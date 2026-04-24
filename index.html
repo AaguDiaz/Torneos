@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ Torneos</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a2010; font-family: Arial, Helvetica, sans-serif; color: #ccc; }
+  input, button, select { font-family: inherit; }
+  button:hover { filter: brightness(1.12); }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #081a0e; }
+  ::-webkit-scrollbar-thumb { background: #1e6b2e; border-radius: 3px; }
+
+  /* ── Mobile responsive ── */
+  @media (max-width: 600px) {
+    .names-grid { grid-template-columns: 1fr !important; }
+
+    .top-bar { flex-wrap: wrap; padding: 6px 10px !important; }
+    .top-bar-title { font-size: 13px !important; order: -1; width: 100%; text-align: center; margin-bottom: 4px; }
+
+    .bracket-scroll { padding: 10px 6px !important; }
+
+    .liga-table { font-size: 10px !important; }
+    .liga-table th, .liga-table td { padding: 3px 4px !important; }
+    .forma-col { display: none !important; }
+
+    .match-row { gap: 4px !important; padding: 6px 8px !important; }
+    .match-team { font-size: 12px !important; }
+    .match-score-cell { font-size: 13px !important; min-width: 40px !important; }
+
+    .round-selector { gap: 3px !important; padding: 6px 8px !important; }
+
+    .hist-card { flex-direction: column !important; align-items: flex-start !important; }
+    .hist-actions { flex-direction: row !important; width: 100%; }
+    .hist-actions button { flex: 1; }
+  }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="js/utils.js"></script>
+<script type="text/babel" src="js/trophies.jsx"></script>
+<script type="text/babel" src="js/modal.jsx"></script>
+<script type="text/babel" src="js/history.jsx"></script>
+<script type="text/babel" src="js/setup.jsx"></script>
+<script type="text/babel" src="js/copa.jsx"></script>
+<script type="text/babel" src="js/liga.jsx"></script>
+<script type="text/babel" src="js/app.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>
