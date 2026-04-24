@@ -177,7 +177,7 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
 }
 
 const setupStyles = {
-  page: { minHeight: '100vh', background: '#0a2010', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '20px 10px' },
+  page: { minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '20px 10px' },
   card: { background: '#0f2d18', border: '2px solid #1e6b2e', borderRadius: 4, width: '100%', maxWidth: 540, overflow: 'hidden' },
   header: { background: '#081a0e', padding: '12px 18px', borderBottom: '2px solid #c8a800', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   logo: { color: '#c8a800', fontWeight: 'bold', fontSize: 20, letterSpacing: 1 },

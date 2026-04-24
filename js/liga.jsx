@@ -115,22 +115,22 @@ function LigaScreen({ tournament, lang, onResult, onReset }) {
                   const dg = row.gf - row.gc;
                   const isChamp = champion && i === 0;
                   return (
-                    <tr key={row.team} style={{ background: isChamp ? '#1a3d20' : i % 2 === 0 ? '#0a2010' : '#081a0e' }}>
-                      <td style={{ ...S.td, color: i < 3 ? '#c8a800' : '#7ab87a', textAlign: 'center', fontWeight: 'bold' }}>{i + 1}</td>
-                      <td style={{ ...S.td, color: '#fff', textAlign: 'left', fontWeight: isChamp ? 'bold' : 'normal', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <tr key={row.team} style={{ background: isChamp ? '#e8f5e8' : i % 2 === 0 ? '#ffffff' : '#eef5ee' }}>
+                      <td style={{ ...S.td, background: 'inherit', color: i === 0 ? '#c8a800' : i < 3 ? '#2a8a3a' : i < 6 ? '#4a7acc' : '#333', textAlign: 'center', fontWeight: 'bold' }}>{i + 1}</td>
+                      <td style={{ ...S.td, background: 'inherit', color: '#111', textAlign: 'left', fontWeight: isChamp ? 'bold' : 'normal', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {isChamp && '🏆 '}{row.team}
                       </td>
-                      <td style={{ ...S.td, textAlign: 'center' }}>{row.pj}</td>
-                      <td style={{ ...S.td, textAlign: 'center', color: '#7ab87a' }}>{row.g}</td>
-                      <td style={{ ...S.td, textAlign: 'center' }}>{row.e}</td>
-                      <td style={{ ...S.td, textAlign: 'center', color: '#c06060' }}>{row.p}</td>
-                      <td style={{ ...S.td, textAlign: 'center' }}>{row.gf}</td>
-                      <td style={{ ...S.td, textAlign: 'center' }}>{row.gc}</td>
-                      <td style={{ ...S.td, textAlign: 'center', color: dg > 0 ? '#7ab87a' : dg < 0 ? '#c06060' : '#aaa' }}>
+                      <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: '#222' }}>{row.pj}</td>
+                      <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: '#1a7a2a', fontWeight: 'bold' }}>{row.g}</td>
+                      <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: '#222' }}>{row.e}</td>
+                      <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: '#cc2222', fontWeight: 'bold' }}>{row.p}</td>
+                      <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: '#222' }}>{row.gf}</td>
+                      <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: '#222' }}>{row.gc}</td>
+                      <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: dg > 0 ? '#1a7a2a' : dg < 0 ? '#cc2222' : '#555' }}>
                         {dg > 0 ? `+${dg}` : dg}
                       </td>
-                      <td style={{ ...S.td, textAlign: 'center', color: '#c8a800', fontWeight: 'bold', fontSize: 14 }}>{row.pts}</td>
-                      <td className="forma-col" style={{ ...S.td, textAlign: 'center' }}><FormaRow forma={row.forma} /></td>
+                      <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: '#c8a800', fontWeight: 'bold', fontSize: 14 }}>{row.pts}</td>
+                      <td className="forma-col" style={{ ...S.td, background: 'inherit', textAlign: 'center' }}><FormaRow forma={row.forma} /></td>
                     </tr>
                   );
                 })}
@@ -188,7 +188,7 @@ function LigaScreen({ tournament, lang, onResult, onReset }) {
 }
 
 const ligaStyles = {
-  page: { minHeight: '100vh', background: '#0a2010', display: 'flex', flexDirection: 'column' },
+  page: { minHeight: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column' },
   topBar: { background: '#081a0e', borderBottom: '2px solid #c8a800', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 10 },
   resetBtn: { background: 'none', border: '1px solid #2a6b3a', color: '#7ab87a', padding: '4px 10px', fontSize: 12, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap', flexShrink: 0 },
   tourTitle: { color: '#c8a800', fontWeight: 'bold', fontSize: 16, flex: 1, textAlign: 'center', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
@@ -202,8 +202,8 @@ const ligaStyles = {
   content: { flex: 1, overflowY: 'auto' },
   tableWrapper: { overflowX: 'auto' },
   table: { width: '100%', borderCollapse: 'collapse', minWidth: 420 },
-  th: { background: '#1e6b2e', color: '#fff', padding: '6px 8px', fontSize: 11, fontWeight: 'bold', border: '1px solid #0a2010', textTransform: 'uppercase' },
-  td: { padding: '5px 8px', fontSize: 12, color: '#aaa', border: '1px solid #0f2d18' },
+  th: { background: '#0f3a18', color: '#fff', padding: '6px 8px', fontSize: 11, fontWeight: 'bold', border: '1px solid #c8ddc8', textTransform: 'uppercase' },
+  td: { padding: '5px 8px', fontSize: 12, color: '#222', border: '1px solid #c8ddc8' },
   roundSelector: { display: 'flex', flexWrap: 'wrap', gap: 4, padding: '10px 12px', background: '#081a0e', borderBottom: '1px solid #1a4d25' },
   roundBtn: { background: '#0a2010', border: '1px solid #2a6b3a', color: '#7ab87a', padding: '4px 8px', fontSize: 11, cursor: 'pointer', borderRadius: 2 },
   roundBtnActive: { background: '#1e6b2e', border: '1px solid #c8a800', color: '#fff', padding: '4px 8px', fontSize: 11, cursor: 'pointer', borderRadius: 2, fontWeight: 'bold' },

@@ -19,7 +19,7 @@ function MatchCard({ match, onClick, highlight, animateWinner }) {
     <div
       style={{
         ...S.card,
-        borderColor: flash ? '#4dff70' : highlight ? '#c8a800' : '#2a6b3a',
+        borderColor: flash ? '#4dff70' : highlight ? '#c8a800' : '#c8ddc8',
         boxShadow: flash ? '0 0 12px #4dff70' : 'none',
         cursor: canClick ? 'pointer' : 'default',
         transition: 'box-shadow 0.3s, border-color 0.3s',
@@ -32,9 +32,9 @@ function MatchCard({ match, onClick, highlight, animateWinner }) {
         return (
           <div key={i} style={{
             ...S.slot,
-            background: isWinner ? '#1e6b2e' : '#081a0e',
-            borderBottom: i === 0 ? '1px solid #1a4d25' : 'none',
-            color: isBye ? '#3a6a3a' : isWinner ? '#fff' : slot.team ? '#ccc' : '#3a6a3a',
+            background: isWinner ? '#e8f5e8' : '#ffffff',
+            borderBottom: i === 0 ? '1px solid #c8ddc8' : 'none',
+            color: isBye ? '#aaa' : isWinner ? '#111' : slot.team ? '#333' : '#aaa',
             fontWeight: isWinner ? 'bold' : 'normal',
           }}>
             <span style={S.teamName}>{isBye ? 'BYE' : slot.team || '—'}</span>
@@ -53,16 +53,16 @@ function MatchCard({ match, onClick, highlight, animateWinner }) {
 }
 
 const matchCardStyles = {
-  card: { width: 130, border: '1.5px solid #2a6b3a', borderRadius: 2, overflow: 'hidden', background: '#0a2010', flexShrink: 0 },
-  slot: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '5px 7px', fontSize: 12, minHeight: 26 },
-  teamName: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 90 },
-  score: { fontWeight: 'bold', fontSize: 13, flexShrink: 0, marginLeft: 4 },
-  playIcon: { color: '#c8a800', fontSize: 9, marginLeft: 2, flexShrink: 0 },
+  card: { width: 169, border: '1.5px solid #c8ddc8', borderRadius: 2, overflow: 'hidden', background: '#ffffff', flexShrink: 0 },
+  slot: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 9px', fontSize: 13, minHeight: 34 },
+  teamName: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 117 },
+  score: { fontWeight: 'bold', fontSize: 14, flexShrink: 0, marginLeft: 4 },
+  playIcon: { color: '#c8a800', fontSize: 10, marginLeft: 2, flexShrink: 0 },
 };
 
 // ── BracketSide ───────────────────────────────────────────────────────────
 function BracketSide({ rounds, side, onMatchClick, lastWinner }) {
-  const CARD_W = 130, CARD_H = 52, COL_GAP = 28, CELL_H = 64;
+  const CARD_W = 169, CARD_H = 68, COL_GAP = 36, CELL_H = 83;
   if (!rounds || rounds.length === 0) return null;
 
   const numR1 = rounds[0].matches.length;
@@ -127,7 +127,7 @@ function FinalCard({ match, onMatchClick, lang, lastWinner }) {
     if (lastWinner && match && match.played) { setFlash(true); setTimeout(() => setFlash(false), 1400); }
   }, [lastWinner]);
 
-  if (!match) return <div style={{ width: 150 }} />;
+  if (!match) return <div style={{ width: 195 }} />;
   const canClick = !match.played && match.home && match.away;
   const S = matchCardStyles;
 
@@ -139,7 +139,7 @@ function FinalCard({ match, onMatchClick, lang, lastWinner }) {
       <div
         style={{
           ...S.card,
-          width: 150,
+          width: 195,
           borderColor: flash ? '#4dff70' : '#c8a800',
           boxShadow: flash ? '0 0 18px #4dff70' : '0 0 6px rgba(200,168,0,0.3)',
           cursor: canClick ? 'pointer' : 'default',
@@ -152,18 +152,18 @@ function FinalCard({ match, onMatchClick, lang, lastWinner }) {
           return (
             <div key={i} style={{
               ...S.slot,
-              background: isWinner ? '#1e6b2e' : '#081a0e',
-              borderBottom: i === 0 ? '1px solid #1a4d25' : 'none',
-              color: slot.team ? (isWinner ? '#fff' : '#ccc') : '#3a6a3a',
+              background: isWinner ? '#e8f5e8' : '#ffffff',
+              borderBottom: i === 0 ? '1px solid #c8ddc8' : 'none',
+              color: slot.team ? (isWinner ? '#111' : '#333') : '#aaa',
               fontWeight: isWinner ? 'bold' : 'normal',
-              fontSize: 13,
-              minHeight: 30,
+              fontSize: 14,
+              minHeight: 34,
             }}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 105 }}>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 137 }}>
                 {slot.team || tx.pending}
               </span>
-              {match.played && <span style={{ color: isWinner ? '#c8a800' : '#777', fontWeight: 'bold', marginLeft: 4 }}>{slot.score}</span>}
-              {canClick && i === 0 && <span style={{ color: '#c8a800', fontSize: 9 }}>▶</span>}
+              {match.played && <span style={{ color: isWinner ? '#c8a800' : '#999', fontWeight: 'bold', marginLeft: 4 }}>{slot.score}</span>}
+              {canClick && i === 0 && <span style={{ color: '#c8a800', fontSize: 10 }}>▶</span>}
             </div>
           );
         })}
@@ -180,8 +180,8 @@ function TriangularView({ triangular, lang, onMatchClick }) {
   const ready = teams.every(Boolean);
 
   return (
-    <div style={{ background: '#0a2010', border: '2px solid #c8a800', borderRadius: 4, padding: 14, marginTop: 16, maxWidth: 440, width: '100%' }}>
-      <div style={{ color: '#c8a800', fontWeight: 'bold', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, borderBottom: '1px solid #1a4d25', paddingBottom: 6 }}>
+    <div style={{ background: '#fff', border: '2px solid #c8a800', borderRadius: 4, padding: 18, marginTop: 16, maxWidth: 572, width: '100%' }}>
+      <div style={{ color: '#c8a800', fontWeight: 'bold', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, borderBottom: '1px solid #c8ddc8', paddingBottom: 6 }}>
         🔺 {tx.triangular}
       </div>
       {!ready && <div style={{ color: '#3a6a3a', fontSize: 12, fontStyle: 'italic' }}>Esperando clasificados del bracket...</div>}
@@ -189,13 +189,13 @@ function TriangularView({ triangular, lang, onMatchClick }) {
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
             {matches.map((m, i) => (
-              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#081a0e', border: '1px solid #1a4d25', borderRadius: 2, padding: '6px 10px' }}>
-                <span style={{ flex: 1, textAlign: 'right', color: m.played && m.winner === m.home ? '#fff' : '#aaa', fontWeight: m.played && m.winner === m.home ? 'bold' : 'normal', fontSize: 13 }}>{m.home}</span>
+              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: i % 2 === 0 ? '#ffffff' : '#eef5ee', border: '1px solid #c8ddc8', borderRadius: 2, padding: '6px 10px' }}>
+                <span style={{ flex: 1, textAlign: 'right', color: m.played && m.winner === m.home ? '#111' : '#555', fontWeight: m.played && m.winner === m.home ? 'bold' : 'normal', fontSize: 13 }}>{m.home}</span>
                 {m.played
                   ? <span style={{ color: '#c8a800', fontWeight: 'bold', fontSize: 14, minWidth: 40, textAlign: 'center' }}>{m.homeScore} – {m.awayScore}</span>
                   : <button style={{ background: '#1e6b2e', border: 'none', color: '#fff', padding: '3px 10px', fontSize: 12, cursor: 'pointer', borderRadius: 2 }} onClick={() => onMatchClick(i)}>▶</button>
                 }
-                <span style={{ flex: 1, color: m.played && m.winner === m.away ? '#fff' : '#aaa', fontWeight: m.played && m.winner === m.away ? 'bold' : 'normal', fontSize: 13 }}>{m.away}</span>
+                <span style={{ flex: 1, color: m.played && m.winner === m.away ? '#111' : '#555', fontWeight: m.played && m.winner === m.away ? 'bold' : 'normal', fontSize: 13 }}>{m.away}</span>
               </div>
             ))}
           </div>
@@ -203,19 +203,26 @@ function TriangularView({ triangular, lang, onMatchClick }) {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
                 <tr>{['#','Equipo',tx.pj,tx.g,tx.e,tx.p,'GF','GC','Pts'].map(h => (
-                  <th key={h} style={{ background: '#1e6b2e', color: '#fff', padding: '4px 6px', textAlign: h === 'Equipo' ? 'left' : 'center', border: '1px solid #0a2010' }}>{h}</th>
+                  <th key={h} style={{ background: '#0f3a18', color: '#fff', padding: '4px 6px', textAlign: h === 'Equipo' ? 'left' : 'center', border: '1px solid #c8ddc8' }}>{h}</th>
                 ))}</tr>
               </thead>
               <tbody>
-                {standings.map((row, i) => (
-                  <tr key={row.team} style={{ background: i % 2 === 0 ? '#0a2010' : '#081a0e' }}>
-                    <td style={{ padding: '3px 6px', color: '#c8a800', textAlign: 'center', border: '1px solid #0a2010' }}>{i + 1}</td>
-                    <td style={{ padding: '3px 6px', color: '#fff', border: '1px solid #0a2010' }}>{row.team}</td>
-                    {[row.pj, row.g, row.e, row.p, row.gf, row.gc, row.pts].map((v, j) => (
-                      <td key={j} style={{ padding: '3px 6px', color: j === 6 ? '#c8a800' : '#ccc', textAlign: 'center', border: '1px solid #0a2010', fontWeight: j === 6 ? 'bold' : 'normal' }}>{v}</td>
-                    ))}
-                  </tr>
-                ))}
+                {standings.map((row, i) => {
+                  const dg = row.gf - row.gc;
+                  return (
+                    <tr key={row.team} style={{ background: i % 2 === 0 ? '#ffffff' : '#eef5ee' }}>
+                      <td style={{ padding: '3px 6px', background: 'inherit', color: i === 0 ? '#c8a800' : i === 1 ? '#2a8a3a' : '#333', textAlign: 'center', border: '1px solid #c8ddc8', fontWeight: 'bold' }}>{i + 1}</td>
+                      <td style={{ padding: '3px 6px', background: 'inherit', color: '#111', border: '1px solid #c8ddc8', fontWeight: i === 0 ? 'bold' : 'normal' }}>{row.team}</td>
+                      <td style={{ padding: '3px 6px', background: 'inherit', color: '#222', textAlign: 'center', border: '1px solid #c8ddc8' }}>{row.pj}</td>
+                      <td style={{ padding: '3px 6px', background: 'inherit', color: '#1a7a2a', textAlign: 'center', border: '1px solid #c8ddc8', fontWeight: 'bold' }}>{row.g}</td>
+                      <td style={{ padding: '3px 6px', background: 'inherit', color: '#222', textAlign: 'center', border: '1px solid #c8ddc8' }}>{row.e}</td>
+                      <td style={{ padding: '3px 6px', background: 'inherit', color: '#cc2222', textAlign: 'center', border: '1px solid #c8ddc8', fontWeight: 'bold' }}>{row.p}</td>
+                      <td style={{ padding: '3px 6px', background: 'inherit', color: '#222', textAlign: 'center', border: '1px solid #c8ddc8' }}>{row.gf}</td>
+                      <td style={{ padding: '3px 6px', background: 'inherit', color: '#222', textAlign: 'center', border: '1px solid #c8ddc8' }}>{row.gc}</td>
+                      <td style={{ padding: '3px 6px', background: 'inherit', color: '#c8a800', textAlign: 'center', border: '1px solid #c8ddc8', fontWeight: 'bold', fontSize: 13 }}>{row.pts}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
@@ -318,7 +325,7 @@ function CopaScreen({ tournament, lang, onResult, onReset }) {
                 <div style={{ width: 20, height: 1.5, background: '#c8a800', alignSelf: 'center', flexShrink: 0 }} />
               )}
               <div style={S.centerColumn}>
-                <Trophy type={cupType} size={90} />
+                <Trophy type={cupType} size={180} />
                 {finalMatch && !champion && (
                   <FinalCard match={finalMatch} lang={lang} lastWinner={lastWinner} onMatchClick={handleFinalClick} />
                 )}
@@ -365,7 +372,7 @@ function CopaScreen({ tournament, lang, onResult, onReset }) {
 }
 
 const copaStyles = {
-  page: { minHeight: '100vh', background: '#0a2010', display: 'flex', flexDirection: 'column' },
+  page: { minHeight: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column' },
   topBar: { background: '#081a0e', borderBottom: '2px solid #c8a800', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
   resetBtn: { background: 'none', border: '1px solid #2a6b3a', color: '#7ab87a', padding: '4px 10px', fontSize: 12, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap', flexShrink: 0 },
   tourTitle: { color: '#c8a800', fontWeight: 'bold', fontSize: 16, flex: 1, textAlign: 'center', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
