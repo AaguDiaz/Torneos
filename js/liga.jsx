@@ -41,7 +41,7 @@ function FormaRow({ forma }) {
   );
 }
 
-function LigaScreen({ tournament, lang, onResult, onReset }) {
+function LigaScreen({ tournament, lang, onResult, onReset, badgeMap }) {
   const tx = T_LIGA[lang] || T_LIGA.es;
   const { teams, liga, tourName } = tournament;
   const { matches, roundType } = liga;
@@ -117,8 +117,12 @@ function LigaScreen({ tournament, lang, onResult, onReset }) {
                   return (
                     <tr key={row.team} style={{ background: isChamp ? '#e8f5e8' : i % 2 === 0 ? '#ffffff' : '#eef5ee' }}>
                       <td style={{ ...S.td, background: 'inherit', color: i === 0 ? '#c8a800' : i < 3 ? '#2a8a3a' : i < 6 ? '#4a7acc' : '#333', textAlign: 'center', fontWeight: 'bold' }}>{i + 1}</td>
-                      <td style={{ ...S.td, background: 'inherit', color: '#111', textAlign: 'left', fontWeight: isChamp ? 'bold' : 'normal', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {isChamp && '🏆 '}{row.team}
+                      <td style={{ ...S.td, background: 'inherit', color: '#111', textAlign: 'left', fontWeight: isChamp ? 'bold' : 'normal', maxWidth: 120 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, overflow: 'hidden' }}>
+                          {isChamp && <span>🏆</span>}
+                          {badgeMap && badgeMap[row.team] && <img src={badgeMap[row.team]} style={{ width: 16, height: 16, objectFit: 'contain', flexShrink: 0 }} alt="" onError={e => { e.target.style.display = 'none'; }} />}
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.team}</span>
+                        </div>
                       </td>
                       <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: '#222' }}>{row.pj}</td>
                       <td style={{ ...S.td, background: 'inherit', textAlign: 'center', color: '#1a7a2a', fontWeight: 'bold' }}>{row.g}</td>
@@ -161,12 +165,18 @@ function LigaScreen({ tournament, lang, onResult, onReset }) {
               <div style={S.matchListHeader}>{tx.round} {activeRound}</div>
               {roundMatches.map(m => (
                 <div key={m.id} className="match-row" style={S.matchRow}>
-                  <span className="match-team" style={{ ...S.matchTeam, textAlign: 'right' }}>{m.home}</span>
+                  <div className="match-team" style={{ ...S.matchTeam, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.home}</span>
+                    {badgeMap && badgeMap[m.home] && <img src={badgeMap[m.home]} style={{ width: 18, height: 18, objectFit: 'contain', flexShrink: 0 }} alt="" onError={e => { e.target.style.display = 'none'; }} />}
+                  </div>
                   {m.played
                     ? <span className="match-score-cell" style={S.matchScore}>{m.homeScore} – {m.awayScore}</span>
                     : <button style={S.playBtn} onClick={() => handlePlayMatch(m)}>{tx.playMatch}</button>
                   }
-                  <span className="match-team" style={{ ...S.matchTeam, textAlign: 'left' }}>{m.away}</span>
+                  <div className="match-team" style={{ ...S.matchTeam, textAlign: 'left', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {badgeMap && badgeMap[m.away] && <img src={badgeMap[m.away]} style={{ width: 18, height: 18, objectFit: 'contain', flexShrink: 0 }} alt="" onError={e => { e.target.style.display = 'none'; }} />}
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.away}</span>
+                  </div>
                 </div>
               ))}
             </div>

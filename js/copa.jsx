@@ -6,7 +6,12 @@ const T_COPA = {
 };
 
 // ── MatchCard ─────────────────────────────────────────────────────────────
-function MatchCard({ match, onClick, highlight, animateWinner }) {
+function TeamBadge({ url }) {
+  if (!url) return null;
+  return <img src={url} style={{ width: 16, height: 16, objectFit: 'contain', flexShrink: 0, marginRight: 4 }} alt="" onError={e => { e.target.style.display = 'none'; }} />;
+}
+
+function MatchCard({ match, onClick, highlight, animateWinner, badgeMap }) {
   const [flash, setFlash] = React.useState(false);
   React.useEffect(() => {
     if (animateWinner && match.played) { setFlash(true); setTimeout(() => setFlash(false), 1200); }
@@ -29,6 +34,7 @@ function MatchCard({ match, onClick, highlight, animateWinner }) {
       {[{ team: match.home, score: match.homeScore }, { team: match.away, score: match.awayScore }].map((slot, i) => {
         const isWinner = match.played && match.winner === slot.team;
         const isBye = match.isBye && !slot.team;
+        const badgeUrl = badgeMap && slot.team ? badgeMap[slot.team] : null;
         return (
           <div key={i} style={{
             ...S.slot,
@@ -37,7 +43,8 @@ function MatchCard({ match, onClick, highlight, animateWinner }) {
             color: isBye ? '#aaa' : isWinner ? '#111' : slot.team ? '#333' : '#aaa',
             fontWeight: isWinner ? 'bold' : 'normal',
           }}>
-            <span style={S.teamName}>{isBye ? 'BYE' : slot.team || '—'}</span>
+            <TeamBadge url={badgeUrl} />
+            <span style={{ ...S.teamName, maxWidth: badgeUrl ? 97 : 117 }}>{isBye ? 'BYE' : slot.team || '—'}</span>
             {match.played && !match.isBye && (
               <span style={{ ...S.score, color: isWinner ? '#c8a800' : '#777' }}>
                 {slot.score ?? ''}
@@ -61,7 +68,7 @@ const matchCardStyles = {
 };
 
 // ── BracketSide ───────────────────────────────────────────────────────────
-function BracketSide({ rounds, side, onMatchClick, lastWinner }) {
+function BracketSide({ rounds, side, onMatchClick, lastWinner, badgeMap }) {
   const CARD_W = 169, CARD_H = 68, COL_GAP = 36, CELL_H = 83;
   if (!rounds || rounds.length === 0) return null;
 
@@ -110,6 +117,7 @@ function BracketSide({ rounds, side, onMatchClick, lastWinner }) {
                 highlight={!match.played && match.home && match.away && !match.isBye}
                 animateWinner={isLast}
                 onClick={() => onMatchClick && onMatchClick(r, i)}
+                badgeMap={badgeMap}
               />
             </div>
           );
@@ -120,7 +128,7 @@ function BracketSide({ rounds, side, onMatchClick, lastWinner }) {
 }
 
 // ── FinalCard ─────────────────────────────────────────────────────────────
-function FinalCard({ match, onMatchClick, lang, lastWinner }) {
+function FinalCard({ match, onMatchClick, lang, lastWinner, badgeMap }) {
   const tx = T_COPA[lang] || T_COPA.es;
   const [flash, setFlash] = React.useState(false);
   React.useEffect(() => {
@@ -149,6 +157,7 @@ function FinalCard({ match, onMatchClick, lang, lastWinner }) {
       >
         {[{ team: match.home, score: match.homeScore }, { team: match.away, score: match.awayScore }].map((slot, i) => {
           const isWinner = match.played && match.winner === slot.team;
+          const badgeUrl = badgeMap && slot.team ? badgeMap[slot.team] : null;
           return (
             <div key={i} style={{
               ...S.slot,
@@ -159,7 +168,8 @@ function FinalCard({ match, onMatchClick, lang, lastWinner }) {
               fontSize: 14,
               minHeight: 34,
             }}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 137 }}>
+              <TeamBadge url={badgeUrl} />
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: badgeUrl ? 115 : 137 }}>
                 {slot.team || tx.pending}
               </span>
               {match.played && <span style={{ color: isWinner ? '#c8a800' : '#999', fontWeight: 'bold', marginLeft: 4 }}>{slot.score}</span>}
@@ -173,7 +183,7 @@ function FinalCard({ match, onMatchClick, lang, lastWinner }) {
 }
 
 // ── TriangularView ────────────────────────────────────────────────────────
-function TriangularView({ triangular, lang, onMatchClick }) {
+function TriangularView({ triangular, lang, onMatchClick, badgeMap }) {
   const tx = T_COPA[lang] || T_COPA.es;
   if (!triangular) return null;
   const { teams, matches, standings } = triangular;
@@ -190,12 +200,18 @@ function TriangularView({ triangular, lang, onMatchClick }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
             {matches.map((m, i) => (
               <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: i % 2 === 0 ? '#ffffff' : '#eef5ee', border: '1px solid #c8ddc8', borderRadius: 2, padding: '6px 10px' }}>
-                <span style={{ flex: 1, textAlign: 'right', color: m.played && m.winner === m.home ? '#111' : '#555', fontWeight: m.played && m.winner === m.home ? 'bold' : 'normal', fontSize: 13 }}>{m.home}</span>
+                <span style={{ flex: 1, textAlign: 'right', color: m.played && m.winner === m.home ? '#111' : '#555', fontWeight: m.played && m.winner === m.home ? 'bold' : 'normal', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                  {m.home}
+                  <TeamBadge url={badgeMap && m.home ? badgeMap[m.home] : null} />
+                </span>
                 {m.played
                   ? <span style={{ color: '#c8a800', fontWeight: 'bold', fontSize: 14, minWidth: 40, textAlign: 'center' }}>{m.homeScore} – {m.awayScore}</span>
                   : <button style={{ background: '#1e6b2e', border: 'none', color: '#fff', padding: '3px 10px', fontSize: 12, cursor: 'pointer', borderRadius: 2 }} onClick={() => onMatchClick(i)}>▶</button>
                 }
-                <span style={{ flex: 1, color: m.played && m.winner === m.away ? '#111' : '#555', fontWeight: m.played && m.winner === m.away ? 'bold' : 'normal', fontSize: 13 }}>{m.away}</span>
+                <span style={{ flex: 1, color: m.played && m.winner === m.away ? '#111' : '#555', fontWeight: m.played && m.winner === m.away ? 'bold' : 'normal', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <TeamBadge url={badgeMap && m.away ? badgeMap[m.away] : null} />
+                  {m.away}
+                </span>
               </div>
             ))}
           </div>
@@ -233,7 +249,7 @@ function TriangularView({ triangular, lang, onMatchClick }) {
 }
 
 // ── CopaScreen ────────────────────────────────────────────────────────────
-function CopaScreen({ tournament, lang, onResult, onReset }) {
+function CopaScreen({ tournament, lang, onResult, onReset, badgeMap }) {
   const tx = T_COPA[lang] || T_COPA.es;
   const [modal, setModal] = React.useState(null);
   const [lastWinner, setLastWinner] = React.useState(null);
@@ -316,6 +332,7 @@ function CopaScreen({ tournament, lang, onResult, onReset }) {
                 side="left"
                 lastWinner={lastWinner}
                 onMatchClick={(r, i) => handleBracketClick(r, i, 'left')}
+                badgeMap={badgeMap}
               />
             )}
 
@@ -327,7 +344,7 @@ function CopaScreen({ tournament, lang, onResult, onReset }) {
               <div style={S.centerColumn}>
                 <Trophy type={cupType} size={180} />
                 {finalMatch && !champion && (
-                  <FinalCard match={finalMatch} lang={lang} lastWinner={lastWinner} onMatchClick={handleFinalClick} />
+                  <FinalCard match={finalMatch} lang={lang} lastWinner={lastWinner} onMatchClick={handleFinalClick} badgeMap={badgeMap} />
                 )}
                 {champion && (
                   <div style={S.champName}>{champion}</div>
@@ -345,6 +362,7 @@ function CopaScreen({ tournament, lang, onResult, onReset }) {
                 side="right"
                 lastWinner={lastWinner}
                 onMatchClick={(r, i) => handleBracketClick(r, i, 'right')}
+                badgeMap={badgeMap}
               />
             )}
           </div>
@@ -353,7 +371,7 @@ function CopaScreen({ tournament, lang, onResult, onReset }) {
         {/* Triangular */}
         {triangular && (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '0 16px 16px' }}>
-            <TriangularView triangular={triangular} lang={lang} onMatchClick={handleTriClick} />
+            <TriangularView triangular={triangular} lang={lang} onMatchClick={handleTriClick} badgeMap={badgeMap} />
           </div>
         )}
       </div>

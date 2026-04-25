@@ -72,7 +72,7 @@ function App() {
     saveState({ screen, lang, tournament });
   }, [screen, lang, tournament]);
 
-  function handleGenerate({ format, cupType, copaOpt, roundType, teams, tourName }) {
+  function handleGenerate({ format, cupType, copaOpt, roundType, teams, tourName, teamBadges }) {
     let copa = null;
     let liga = null;
 
@@ -89,7 +89,7 @@ function App() {
       liga = { matches, roundType };
     }
 
-    const newTournament = { format, cupType, copaOpt, roundType, teams, tourName, copa, liga };
+    const newTournament = { format, cupType, copaOpt, roundType, teams, tourName, copa, liga, teamBadges: teamBadges || [] };
     setTournament(newTournament);
     setScreen(format);
   }
@@ -130,6 +130,15 @@ function App() {
     setLang(prev => prev === 'es' ? 'en' : 'es');
   }
 
+  const badgeMap = React.useMemo(() => {
+    if (!tournament?.teams) return {};
+    return (tournament.teams).reduce((m, t, i) => {
+      const b = tournament.teamBadges && tournament.teamBadges[i];
+      if (b) m[t] = b;
+      return m;
+    }, {});
+  }, [tournament]);
+
   const langBtn = (
     <button
       onClick={toggleLang}
@@ -158,6 +167,7 @@ function App() {
           lang={lang}
           onResult={handleCopaResult}
           onReset={handleReset}
+          badgeMap={badgeMap}
         />
       )}
       {screen === 'liga' && tournament && (
@@ -166,6 +176,7 @@ function App() {
           lang={lang}
           onResult={handleLigaResult}
           onReset={handleReset}
+          badgeMap={badgeMap}
         />
       )}
       {screen === 'history' && (

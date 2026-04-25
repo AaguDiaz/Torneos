@@ -35,8 +35,10 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
   const [copaOpt, setCopaOpt] = React.useState('byes');
   const [roundType, setRoundType] = React.useState('single');
   const [teamNames, setTeamNames] = React.useState(Array(8).fill(''));
+  const [teamBadges, setTeamBadges] = React.useState(Array(8).fill(null));
   const [tourName, setTourName] = React.useState('');
   const [error, setError] = React.useState('');
+  const [pickerIdx, setPickerIdx] = React.useState(null);
 
   function handleNumTeams(n) {
     setNumTeams(n);
@@ -45,10 +47,24 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
       while (next.length < n) next.push('');
       return next.slice(0, n);
     });
+    setTeamBadges(prev => {
+      const next = [...prev];
+      while (next.length < n) next.push(null);
+      return next.slice(0, n);
+    });
   }
 
   function handleName(i, v) {
     setTeamNames(prev => prev.map((x, j) => j === i ? v : x));
+  }
+
+  function handleBadgeSelect(i, name, badge) {
+    setTeamNames(prev => prev.map((x, j) => j === i ? name : x));
+    setTeamBadges(prev => prev.map((x, j) => j === i ? badge : x));
+  }
+
+  function handleClearBadge(i) {
+    setTeamBadges(prev => prev.map((x, j) => j === i ? null : x));
   }
 
   function handleGenerate() {
@@ -62,6 +78,7 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
       roundType: format === 'liga' ? roundType : null,
       teams: teamNames.map(n => n.trim()),
       tourName: tourName.trim(),
+      teamBadges,
     });
   }
 
@@ -155,6 +172,17 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
             {teamNames.map((name, i) => (
               <div key={i} style={S.nameRow}>
                 <span style={S.nameIdx}>{i + 1}</span>
+                {teamBadges[i]
+                  ? (
+                    <div style={S.badgeThumbWrap} onClick={() => handleClearBadge(i)} title="Quitar escudo">
+                      <img src={teamBadges[i]} style={S.badgeThumb} alt="" />
+                      <span style={S.badgeThumbX}>✕</span>
+                    </div>
+                  )
+                  : (
+                    <button style={S.shieldBtn} onClick={() => setPickerIdx(i)} title="Elegir escudo">🛡️</button>
+                  )
+                }
                 <input
                   style={S.input}
                   value={name}
@@ -165,6 +193,13 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
             ))}
           </div>
         </div>
+
+        {pickerIdx !== null && (
+          <BadgePicker
+            onSelect={(name, badge) => handleBadgeSelect(pickerIdx, name, badge)}
+            onClose={() => setPickerIdx(null)}
+          />
+        )}
 
         {error && <div style={S.error}>{error}</div>}
 
@@ -197,6 +232,10 @@ const setupStyles = {
   namesGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 },
   nameRow: { display: 'flex', alignItems: 'center', gap: 6 },
   nameIdx: { color: '#c8a800', fontSize: 12, fontWeight: 'bold', width: 18, textAlign: 'right', flexShrink: 0 },
+  shieldBtn: { background: '#081a0e', border: '1px solid #2a6b3a', color: '#7ab87a', padding: '0 5px', fontSize: 14, cursor: 'pointer', borderRadius: 2, flexShrink: 0, lineHeight: '26px', height: 28 },
+  badgeThumbWrap: { position: 'relative', width: 28, height: 28, flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  badgeThumb: { width: 24, height: 24, objectFit: 'contain', display: 'block' },
+  badgeThumbX: { position: 'absolute', top: -4, right: -4, background: '#6b1e1e', color: '#fff', fontSize: 8, borderRadius: '50%', width: 12, height: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 },
   error: { color: '#ff6060', fontSize: 12, padding: '8px 18px', background: '#2a0000' },
   generateBtn: { display: 'block', width: '100%', background: '#1e6b2e', border: 'none', color: '#fff', padding: '14px', fontSize: 16, fontWeight: 'bold', cursor: 'pointer', letterSpacing: 1, borderTop: '2px solid #c8a800' },
 };
