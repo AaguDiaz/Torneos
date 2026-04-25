@@ -2,7 +2,7 @@
 
 const T_SETUP = {
   es: {
-    title: 'Nuevo Torneo', format: 'Formato', copa: 'Copa', liga: 'Liga',
+    title: 'Nuevo Torneo', format: 'Formato', copa: 'Copa', liga: 'Liga', magico: '✨ PES Mágico',
     cupType: 'Tipo de Copa', teams: 'Participantes', numTeams: 'Cantidad',
     teamName: 'Equipo', names: 'Nombres de equipos', copaOpt: 'Clasificación (equipos no potencia de 2)',
     byes: 'Byes aleatorios', triangular: 'Fase especial (triangular)',
@@ -12,9 +12,10 @@ const T_SETUP = {
     generate: 'Generar torneo', fillAll: 'Completá todos los nombres de equipos.',
     tourName: 'Nombre del torneo (opcional)',
     history: '📋 Historial',
+    magicoDesc: '6 jugadores · 2 grupos · Upper/Lower bracket · Gran Final',
   },
   en: {
-    title: 'New Tournament', format: 'Format', copa: 'Cup', liga: 'League',
+    title: 'New Tournament', format: 'Format', copa: 'Cup', liga: 'League', magico: '✨ PES Magic',
     cupType: 'Cup Type', teams: 'Participants', numTeams: 'Count',
     teamName: 'Team', names: 'Team names', copaOpt: 'Bracket option (non-power-of-2 teams)',
     byes: 'Random byes', triangular: 'Special phase (triangular)',
@@ -24,6 +25,7 @@ const T_SETUP = {
     generate: 'Generate tournament', fillAll: 'Please fill all team names.',
     tourName: 'Tournament name (optional)',
     history: '📋 History',
+    magicoDesc: '6 players · 2 groups · Upper/Lower bracket · Grand Final',
   }
 };
 
@@ -54,12 +56,17 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
     });
   }
 
+  function handleFormat(f) {
+    setFormat(f);
+    if (f === 'magico') handleNumTeams(6);
+  }
+
   function handleName(i, v) {
     setTeamNames(prev => prev.map((x, j) => j === i ? v : x));
   }
 
   function handleBadgeSelect(i, name, badge) {
-    setTeamNames(prev => prev.map((x, j) => j === i ? name : x));
+    setTeamNames(prev => prev.map((x, j) => j === i ? (x.trim() ? x : name) : x));
     setTeamBadges(prev => prev.map((x, j) => j === i ? badge : x));
   }
 
@@ -81,6 +88,9 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
       teamBadges,
     });
   }
+
+  // For magico, numTeams label shows fixed 6
+  const displayNumTeams = format === 'magico' ? 6 : numTeams;
 
   const S = setupStyles;
 
@@ -108,13 +118,15 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
         <div style={S.section}>
           <label style={S.label}>{tx.format}</label>
           <div style={S.btnRow}>
-            <button style={format === 'copa' ? S.btnActive : S.btn} onClick={() => setFormat('copa')}>🏆 {tx.copa}</button>
-            <button style={format === 'liga' ? S.btnActive : S.btn} onClick={() => setFormat('liga')}>📊 {tx.liga}</button>
+            <button style={format === 'copa' ? S.btnActive : S.btn} onClick={() => handleFormat('copa')}>🏆 {tx.copa}</button>
+            <button style={format === 'liga' ? S.btnActive : S.btn} onClick={() => handleFormat('liga')}>📊 {tx.liga}</button>
+            <button style={format === 'magico' ? S.btnActive : S.btn} onClick={() => handleFormat('magico')}>{tx.magico}</button>
           </div>
+          {format === 'magico' && <div style={{ color: '#7ab87a', fontSize: 11, marginTop: 6 }}>{tx.magicoDesc}</div>}
         </div>
 
         {/* Copa-specific */}
-        {format === 'copa' && (
+        {format === 'copa' && format !== 'magico' && (
           <>
             <div style={S.section}>
               <label style={S.label}>{tx.cupType}</label>
@@ -155,15 +167,17 @@ function SetupScreen({ lang, onGenerate, onHistory }) {
           </div>
         )}
 
-        {/* Num teams */}
-        <div style={S.section}>
-          <label style={S.label}>{tx.numTeams}</label>
-          <div style={S.btnRow}>
-            {[4,5,6,7,8,9,10,12,14,16].map(n => (
-              <button key={n} style={numTeams === n ? S.btnNumActive : S.btnNum} onClick={() => handleNumTeams(n)}>{n}</button>
-            ))}
+        {/* Num teams — hidden for magico (fixed at 6) */}
+        {format !== 'magico' && (
+          <div style={S.section}>
+            <label style={S.label}>{tx.numTeams}</label>
+            <div style={S.btnRow}>
+              {[4,5,6,7,8,9,10,12,14,16].map(n => (
+                <button key={n} style={numTeams === n ? S.btnNumActive : S.btnNum} onClick={() => handleNumTeams(n)}>{n}</button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Team names */}
         <div style={S.section}>

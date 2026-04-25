@@ -260,11 +260,122 @@ const TU = (() => {
     return { round: nextRound, matches: unplayed.filter(m => m.round === nextRound) };
   }
 
+  // ── PES MÁGICO ────────────────────────────────────────────────
+  function generateMagico(teams) {
+    // pairs (0,1),(2,3),(4,5) must be in different groups
+    const pairs = [[0,1],[2,3],[4,5]];
+    const gA = [], gB = [];
+    pairs.forEach(([a, b]) => {
+      if (Math.random() < 0.5) { gA.push(teams[a]); gB.push(teams[b]); }
+      else { gA.push(teams[b]); gB.push(teams[a]); }
+    });
+    function mkGroupMatches(t) {
+      return [blankMatch(t[0], t[1]), blankMatch(t[0], t[2]), blankMatch(t[1], t[2])];
+    }
+    return {
+      groups: {
+        A: { teams: gA, matches: mkGroupMatches(gA) },
+        B: { teams: gB, matches: mkGroupMatches(gB) }
+      },
+      upperFinal: null, lowerSemi1: null, lowerSemi2: null,
+      lowerFinal: null, lowerVsUpper: null, grandFinal: null,
+      champion: null
+    };
+  }
+
+  function calcMagicoGroupStandings(group) {
+    const st = {};
+    group.teams.forEach(t => { st[t] = { team: t, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, pts: 0 }; });
+    group.matches.filter(m => m.played && m.home && m.away).forEach(m => {
+      const h = st[m.home], a = st[m.away];
+      if (!h || !a) return;
+      const hs = +m.homeScore, as_ = +m.awayScore;
+      h.pj++; a.pj++; h.gf += hs; h.gc += as_; a.gf += as_; a.gc += hs;
+      if (hs > as_) { h.pg++; h.pts += 3; a.pp++; }
+      else if (as_ > hs) { a.pg++; a.pts += 3; h.pp++; }
+      else { h.pe++; a.pe++; h.pts++; a.pts++; }
+    });
+    return Object.values(st).sort((a, b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc) || b.gf - a.gf);
+  }
+
+  function applyMagicoGroupResult(magico, group, matchIdx, homeScore, awayScore) {
+    const s = JSON.parse(JSON.stringify(magico));
+    const m = s.groups[group].matches[matchIdx];
+    m.homeScore = homeScore; m.awayScore = awayScore; m.played = true;
+    m.winner = homeScore > awayScore ? m.home : awayScore > homeScore ? m.away : null;
+    const aAll = s.groups.A.matches.every(x => x.played);
+    const bAll = s.groups.B.matches.every(x => x.played);
+    if (aAll && bAll && !s.upperFinal) {
+      const stA = calcMagicoGroupStandings(s.groups.A);
+      const stB = calcMagicoGroupStandings(s.groups.B);
+      s.upperFinal = blankMatch(stA[0].team, stB[0].team);
+      s.lowerSemi1 = blankMatch(stA[1].team, stB[2].team);
+      s.lowerSemi2 = blankMatch(stB[1].team, stA[2].team);
+    }
+    return s;
+  }
+
+  function applyMagicoPlayoffResult(magico, matchKey, homeScore, awayScore, penWinner) {
+    const s = JSON.parse(JSON.stringify(magico));
+    const m = s[matchKey];
+    m.homeScore = homeScore; m.awayScore = awayScore; m.played = true;
+    const winner = homeScore > awayScore ? m.home : awayScore > homeScore ? m.away : (penWinner || m.home);
+    m.winner = winner;
+    if (homeScore === awayScore) m.penalties = true;
+    const loser = winner === m.home ? m.away : m.home;
+    if (matchKey === 'upperFinal') {
+      if (s.lowerFinal && s.lowerFinal.played) {
+        s.lowerVsUpper = blankMatch(s.lowerFinal.winner, loser);
+      }
+    } else if (matchKey === 'lowerSemi1' || matchKey === 'lowerSemi2') {
+      if (s.lowerSemi1 && s.lowerSemi1.played && s.lowerSemi2 && s.lowerSemi2.played) {
+        s.lowerFinal = blankMatch(s.lowerSemi1.winner, s.lowerSemi2.winner);
+      }
+    } else if (matchKey === 'lowerFinal') {
+      if (s.upperFinal && s.upperFinal.played) {
+        const uLoser = s.upperFinal.winner === s.upperFinal.home ? s.upperFinal.away : s.upperFinal.home;
+        s.lowerVsUpper = blankMatch(winner, uLoser);
+      }
+    } else if (matchKey === 'lowerVsUpper') {
+      const uWinner = s.upperFinal && s.upperFinal.winner;
+      if (uWinner) s.grandFinal = blankMatch(winner, uWinner);
+    } else if (matchKey === 'grandFinal') {
+      s.champion = winner;
+    }
+    return s;
+  }
+
+  function calcMagicoStats(magico) {
+    const allTeams = [...magico.groups.A.teams, ...magico.groups.B.teams];
+    const stats = {};
+    allTeams.forEach(t => { stats[t] = { team: t, pj: 0, pg: 0, pp: 0, gf: 0, gc: 0 }; });
+    const allMatches = [
+      ...magico.groups.A.matches,
+      ...magico.groups.B.matches,
+      ...[magico.upperFinal, magico.lowerSemi1, magico.lowerSemi2,
+          magico.lowerFinal, magico.lowerVsUpper, magico.grandFinal
+      ].filter(Boolean)
+    ];
+    allMatches.filter(m => m.played && m.home && m.away).forEach(m => {
+      const h = stats[m.home], a = stats[m.away];
+      if (!h || !a) return;
+      const hs = +m.homeScore, as_ = +m.awayScore;
+      h.pj++; a.pj++; h.gf += hs; h.gc += as_; a.gf += as_; a.gc += hs;
+      if (m.winner === m.home) { h.pg++; a.pp++; }
+      else if (m.winner === m.away) { a.pg++; h.pp++; }
+    });
+    return allTeams
+      .map(t => ({ ...stats[t], wr: stats[t].pj > 0 ? (stats[t].pg / stats[t].pj * 100) : 0 }))
+      .sort((a, b) => b.wr - a.wr || b.pg - a.pg || b.gf - a.gf);
+  }
+
   return {
     generateCopaByes, generateCopaTriangular,
     applyCopaResult, applyTriResult,
     generateLiga, calcStandings, applyLigaResult,
     getNextCopaMatch, getNextLigaRound,
-    getRoundName, propagateWinners
+    getRoundName, propagateWinners,
+    generateMagico, calcMagicoGroupStandings,
+    applyMagicoGroupResult, applyMagicoPlayoffResult, calcMagicoStats
   };
 })();

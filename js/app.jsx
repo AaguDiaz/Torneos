@@ -26,17 +26,21 @@ function pushToHistory(screen, lang, tournament) {
 
   const hasActivity = tournament.format === 'copa'
     ? tournament.copa?.rounds?.some(r => r.matches.some(m => m.played && !m.isBye))
-    : tournament.liga?.matches?.some(m => m.played);
+    : tournament.format === 'liga'
+    ? tournament.liga?.matches?.some(m => m.played)
+    : tournament.magico?.groups?.A?.matches?.some(m => m.played);
   if (!hasActivity) return;
 
   const champion = tournament.format === 'copa'
     ? tournament.copa?.champion || null
-    : (() => {
+    : tournament.format === 'liga'
+    ? (() => {
         const matches = tournament.liga?.matches || [];
         return matches.every(m => m.played)
           ? TU.calcStandings(tournament.teams, matches)[0]?.team || null
           : null;
-      })();
+      })()
+    : tournament.magico?.champion || null;
 
   const entry = {
     id: Math.random().toString(36).slice(2, 11),
@@ -75,6 +79,7 @@ function App() {
   function handleGenerate({ format, cupType, copaOpt, roundType, teams, tourName, teamBadges }) {
     let copa = null;
     let liga = null;
+    let magico = null;
 
     if (format === 'copa') {
       const rounds = copaOpt === 'byes'
@@ -84,12 +89,14 @@ function App() {
         ? TU.generateCopaTriangular(teams, lang).triangular
         : null;
       copa = { rounds, triangular: triData, champion: null };
-    } else {
+    } else if (format === 'liga') {
       const matches = TU.generateLiga(teams, roundType === 'double');
       liga = { matches, roundType };
+    } else if (format === 'magico') {
+      magico = TU.generateMagico(teams);
     }
 
-    const newTournament = { format, cupType, copaOpt, roundType, teams, tourName, copa, liga, teamBadges: teamBadges || [] };
+    const newTournament = { format, cupType, copaOpt, roundType, teams, tourName, copa, liga, magico, teamBadges: teamBadges || [] };
     setTournament(newTournament);
     setScreen(format);
   }
@@ -102,11 +109,17 @@ function App() {
     setTournament(prev => ({ ...prev, liga: { ...prev.liga, matches: newMatches } }));
   }
 
+  function handleMagicoResult(newMagico) {
+    setTournament(prev => ({ ...prev, magico: newMagico }));
+  }
+
   function handleReset() {
     if (tournament) {
       const hasActivity = tournament.format === 'copa'
         ? tournament.copa?.rounds?.some(r => r.matches.some(m => m.played && !m.isBye))
-        : tournament.liga?.matches?.some(m => m.played);
+        : tournament.format === 'liga'
+        ? tournament.liga?.matches?.some(m => m.played)
+        : tournament.magico?.groups?.A?.matches?.some(m => m.played);
 
       if (hasActivity) {
         const msg = lang === 'en'
@@ -175,6 +188,15 @@ function App() {
           tournament={tournament}
           lang={lang}
           onResult={handleLigaResult}
+          onReset={handleReset}
+          badgeMap={badgeMap}
+        />
+      )}
+      {screen === 'magico' && tournament && (
+        <MagicoScreen
+          tournament={tournament}
+          lang={lang}
+          onResult={handleMagicoResult}
           onReset={handleReset}
           badgeMap={badgeMap}
         />
