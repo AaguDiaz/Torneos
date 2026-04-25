@@ -7,7 +7,7 @@ const ARGENTINA_TEAMS = [
   'Banfield', 'Barracas Central', 'Belgrano',
   'Boca Juniors', 'Central Cordoba', 'Defensa y Justicia',
   'Deportivo Riestra', 'Estudiantes de La Plata', 'Estudiantes de Río Cuarto',
-  'Gimnasia y Esgrima de La Plata', 'Gimnasia y esgrisma de Mendoza', 'Huracan',
+  'Gimnasia y Esgrima de La Plata', 'Gimnasia y Esgrima de Mendoza', 'Huracan',
   'Independiente', 'Independiente Rivadavia', 'Instituto',
   'Lanus', "Newell's Old Boys", 'Platense',
   'Racing Club', 'River Plate', 'Rosario Central',
